@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: autocare-django
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn autocare.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      # Update ALLOWED_HOSTS with your actual Render domain after deployment
+      - key: ALLOWED_HOSTS
+        value: autocare-django.onrender.com
+      # Database credentials - set these manually in Render dashboard
+      # For MySQL, you'll need to use an external MySQL service
+      # (e.g., PlanetScale, AWS RDS, or another MySQL provider)
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 3306
+      # Update CSRF_TRUSTED_ORIGINS with your actual Render domain
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://autocare-django.onrender.com
+      - key: CORS_ALLOW_ALL_ORIGINS
+        value: False
+      - key: CSRF_COOKIE_SECURE
+        value: True
+      - key: SESSION_COOKIE_SECURE
+        value: True
+      - key: CSRF_COOKIE_HTTPONLY
+        value: True
+

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Vehicle - AutoCare</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-color: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            background: #f8fafc;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 800px;
+            padding: 30px;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-modern {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-modern .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .btn-modern {
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-pencil-square"></i> Edit Vehicle</h1>
+                <p class="mb-0 opacity-75">Update your vehicle information</p>
+            </div>
+            <button class="btn back-btn" onclick="window.location.href='/dashboard/customer/'">
+                <i class="bi bi-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Vehicle Form -->
+    <div class="card card-modern">
+        <div class="card-header">
+            <i class="bi bi-car-front-fill me-2"></i> Vehicle Information
+        </div>
+        <div class="card-body p-4">
+            <form id="editVehicleForm">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-car-front me-2"></i>Model
+                    </label>
+                    <input type="text" id="model" class="form-control form-control-lg" style="border-radius: 10px;" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-123 me-2"></i>Registration Number
+                    </label>
+                    <input type="text" id="registration_no" class="form-control form-control-lg" style="border-radius: 10px;" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-calendar3 me-2"></i>Last Service Date
+                    </label>
+                    <input type="date" id="last_service_date" class="form-control form-control-lg" style="border-radius: 10px;">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-speedometer2 me-2"></i>Mileage
+                    </label>
+                    <input type="number" id="mileage" class="form-control form-control-lg" style="border-radius: 10px;">
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-modern text-white" 
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="bi bi-check-circle me-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+if (!localStorage.getItem("access")) window.location.href = "/login/";
+
+async function refreshAccessToken() {
+    const refresh = localStorage.getItem("refresh");
+    if (!refresh) {
+        window.location.href = "/login/";
+        return null;
+    }
+    try {
+        const res = await fetch("/api/token/refresh/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh })
+        });
+        if (!res.ok) {
+            window.location.href = "/login/";
+            return null;
+        }
+        const data = await res.json();
+        localStorage.setItem("access", data.access);
+        return data.access;
+    } catch (error) {
+        console.error("Token refresh error:", error);
+        window.location.href = "/login/";
+        return null;
+    }
+}
+
+const vehicleId = window.location.pathname.split("/").pop();
+
+async function loadVehicle() {
+    try {
+        let token = await refreshAccessToken();
+        if (!token) return;
+
+        const res = await fetch(`/api/vehicles/${vehicleId}/`, {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        
+        if (res.status === 401) {
+            token = await refreshAccessToken();
+            if (!token) return;
+            const retryRes = await fetch(`/api/vehicles/${vehicleId}/`, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!retryRes.ok) throw new Error("Failed to load vehicle");
+            const vehicle = await retryRes.json();
+            populateForm(vehicle);
+            return;
+        }
+        
+        if (!res.ok) throw new Error("Failed to load vehicle");
+        const vehicle = await res.json();
+        populateForm(vehicle);
+    } catch (err) {
+        console.error(err);
+        alert("Error loading vehicle details");
+    }
+}
+
+function populateForm(vehicle) {
+    document.getElementById("model").value = vehicle.model || '';
+    document.getElementById("registration_no").value = vehicle.registration_no || '';
+    document.getElementById("last_service_date").value = vehicle.last_service_date || '';
+    document.getElementById("mileage").value = vehicle.mileage || '';
+}
+
+document.getElementById("editVehicleForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    let token = await refreshAccessToken();
+    if (!token) return;
+
+    const data = {
+        model: document.getElementById("model").value,
+        registration_no: document.getElementById("registration_no").value,
+        last_service_date: document.getElementById("last_service_date").value || null,
+        mileage: document.getElementById("mileage").value || null,
+    };
+
+    try {
+        const res = await fetch(`/api/vehicles/${vehicleId}/`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (res.status === 401) {
+            token = await refreshAccessToken();
+            if (!token) return;
+            const retryRes = await fetch(`/api/vehicles/${vehicleId}/`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(data)
+            });
+            if (!retryRes.ok) {
+                const resp = await retryRes.json();
+                alert("Failed to update vehicle: " + JSON.stringify(resp));
+                return;
+            }
+            alert("Vehicle updated successfully!");
+            window.location.href = "/dashboard/customer/";
+            return;
+        }
+
+        const resp = await res.json();
+        if (res.ok) {
+            alert("Vehicle updated successfully!");
+            window.location.href = "/dashboard/customer/";
+        } else {
+            alert("Failed to update vehicle: " + JSON.stringify(resp));
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Error updating vehicle");
+    }
+});
+
+loadVehicle();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

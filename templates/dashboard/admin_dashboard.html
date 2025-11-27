@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AutoCare</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-color: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            background: #f8fafc;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 1400px;
+            padding: 30px;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .stat-card {
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 3rem;
+            opacity: 0.3;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+
+        .stat-card .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-modern {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-modern .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .btn-modern {
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .table-modern {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table-modern tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-modern tbody tr:hover {
+            background-color: #f1f5f9;
+            transform: scale(1.01);
+        }
+
+        .badge-modern {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .management-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .stat-card .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-speedometer2"></i> Admin Dashboard</h1>
+                <p class="mb-0 opacity-75">Welcome back! Here's what's happening today.</p>
+            </div>
+            <button class="btn logout-btn" onclick="logoutUser()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="bi bi-people-fill stat-icon"></i>
+                <div class="stat-label">Total Users</div>
+                <div class="stat-number" id="usersCount">0</div>
+                <small class="opacity-75">Registered users</small>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="bi bi-car-front-fill stat-icon"></i>
+                <div class="stat-label">Total Vehicles</div>
+                <div class="stat-number" id="vehiclesCount">0</div>
+                <small class="opacity-75">Registered vehicles</small>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card text-white" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="bi bi-calendar-check-fill stat-icon"></i>
+                <div class="stat-label">Total Bookings</div>
+                <div class="stat-number" id="bookCount">0</div>
+                <small class="opacity-75">Service bookings</small>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card text-white" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="bi bi-wrench-adjustable stat-icon"></i>
+                <div class="stat-label">Active Mechanics</div>
+                <div class="stat-number" id="mechanicsCount">0</div>
+                <small class="opacity-75">Available staff</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Section -->
+    <div class="card card-modern mb-4">
+        <div class="card-header">
+            <i class="bi bi-gear-fill me-2"></i> Management Panel
+        </div>
+        <div class="card-body p-4">
+            <div class="management-grid">
+                <button onclick="location.href='/dashboard/admin/manage-users/'" 
+                        class="btn btn-modern text-white w-100" 
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="bi bi-people-fill me-2"></i> Manage Users
+                </button>
+
+                <button onclick="location.href='/dashboard/admin/manage-vehicles/'" 
+                        class="btn btn-modern text-white w-100" 
+                        style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="bi bi-car-front-fill me-2"></i> Manage Vehicles
+                </button>
+
+                <button onclick="location.href='/dashboard/admin/manage-bookings/'" 
+                        class="btn btn-modern text-white w-100" 
+                        style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="bi bi-calendar-check-fill me-2"></i> Manage Bookings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        <!-- Bookings by Status Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="bi bi-pie-chart-fill me-2"></i> Bookings by Status
+                </div>
+                <div class="card-body p-4">
+                    <canvas id="bookingsStatusChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Types Distribution Chart -->
+        <div class="col-lg-6 mb-4">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="bi bi-bar-chart-fill me-2"></i> Service Types Distribution
+                </div>
+                <div class="card-body p-4">
+                    <canvas id="serviceTypesChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Monthly Bookings Trend -->
+        <div class="col-lg-8 mb-4">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="bi bi-graph-up me-2"></i> Monthly Bookings Trend
+                </div>
+                <div class="card-body p-4">
+                    <canvas id="monthlyTrendChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users by Role Chart -->
+        <div class="col-lg-4 mb-4">
+            <div class="card card-modern">
+                <div class="card-header">
+                    <i class="bi bi-people me-2"></i> Users by Role
+                </div>
+                <div class="card-body p-4">
+                    <canvas id="usersRoleChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bookings Table -->
+    <div class="card card-modern mb-4">
+        <div class="card-header">
+            <i class="bi bi-list-ul me-2"></i> All Service Bookings
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-modern table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th>Service Type</th>
+                            <th>Preferred Date</th>
+                            <th>Status</th>
+                            <th>Mechanic</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="booking-table-body">
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading bookings...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Assign Mechanic Modal -->
+    <div class="modal fade" id="assignMechanicModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+                <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-badge-fill me-2"></i>Assign Mechanic
+                    </h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" id="assign-booking-id">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-wrench-adjustable me-2"></i>Select Mechanic
+                        </label>
+                        <select id="mechanic-dropdown" class="form-select form-select-lg" style="border-radius: 10px;">
+                            <option value="">Loading mechanics...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: none; padding: 20px 25px;">
+                    <button class="btn btn-secondary btn-modern" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </button>
+                    <button class="btn btn-primary btn-modern text-white" onclick="assignMechanic()" 
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="bi bi-check-circle me-2"></i>Assign
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+/* AUTH & LOGOUT */
+if (!localStorage.getItem("access")) {
+    window.location.href = "/login/";
+}
+
+function logoutUser() {
+    localStorage.clear();
+    window.location.href = "/login/";
+}
+
+async function refreshAccessToken() {
+    const refresh = localStorage.getItem("refresh");
+    if (!refresh) return logoutUser();
+
+    const res = await fetch("/api/token/refresh/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh })
+    });
+
+    if (!res.ok) return logoutUser();
+    const data = await res.json();
+
+    localStorage.setItem("access", data.access);
+    return data.access;
+}
+
+/* SUMMARY COUNTS */
+/* SUMMARY COUNTS */
+async function loadSummary() {
+    const token = await refreshAccessToken();
+    if (!token) return;
+
+    async function safeCount(url) {
+        try {
+            const res = await fetch(url, {
+                headers: { Authorization: "Bearer " + token }
+            });
+            if (!res.ok) {
+                console.error(`Failed to fetch ${url}:`, res.status);
+                return 0;
+            }
+            const data = await res.json();
+            
+            // Handle paginated response (has 'results' and 'count')
+            if (data.results && typeof data.count === 'number') {
+                return data.count;
+            }
+            // Handle array response
+            if (Array.isArray(data)) {
+                return data.length;
+            }
+            // Handle object with count property
+            if (typeof data.count === 'number') {
+                return data.count;
+            }
+            console.warn(`Unexpected response format for ${url}:`, data);
+            return 0;
+        } catch (error) {
+            console.error(`Error fetching ${url}:`, error);
+            return 0;
+        }
+    }
+
+    document.getElementById("usersCount").innerHTML =
+        await safeCount("/api/users/");
+
+    document.getElementById("vehiclesCount").innerHTML =
+        await safeCount("/api/vehicles/");
+
+    document.getElementById("bookCount").innerHTML =
+        await safeCount("/api/bookings/");
+
+    // Load mechanics count
+    const mechanicsRes = await fetch("/api/users/?role=mechanic", {
+        headers: { Authorization: "Bearer " + token }
+    });
+    if (mechanicsRes.ok) {
+        const mechanicsData = await mechanicsRes.json();
+        const mechanics = Array.isArray(mechanicsData) ? mechanicsData : (mechanicsData.results || []);
+        document.getElementById("mechanicsCount").innerHTML = mechanics.length;
+    }
+}
+
+
+
+/* LOAD ALL BOOKINGS */
+async function loadBookings() {
+    try {
+        const token = await refreshAccessToken();
+        if (!token) return;
+
+        const res = await fetch("/api/bookings/", {
+            headers: { Authorization: "Bearer " + token }
+        });
+
+        if (!res.ok) {
+            console.error("Failed to load bookings:", res.status);
+            document.getElementById("booking-table-body").innerHTML = 
+                '<tr><td colspan="8" class="text-danger">Failed to load bookings</td></tr>';
+            return;
+        }
+
+        const data = await res.json();
+        // Handle paginated response or array
+        const bookings = Array.isArray(data) ? data : (data.results || []);
+        
+        let rows = "";
+        
+        if (bookings.length === 0) {
+            rows = '<tr><td colspan="8" class="text-center">No bookings found</td></tr>';
+        } else {
+            bookings.forEach(b => {
+                const customerName = b.customer?.username || '-';
+                const vehicleModel = b.vehicle?.model || '-';
+                const vehicleReg = b.vehicle?.registration_no || '-';
+                const mechanicName = b.mechanic?.username || null;
+                const status = b.status || 'pending';
+                
+                rows += `
+                    <tr>
+                        <td class="ps-4 fw-semibold">#${b.id}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-circle me-2 text-primary"></i>
+                                <span>${customerName}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-car-front me-2 text-info"></i>
+                                <div>
+                                    <div class="fw-semibold">${vehicleModel}</div>
+                                    <small class="text-muted">${vehicleReg}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">${b.service_type || '-'}</span>
+                        </td>
+                        <td>
+                            <i class="bi bi-calendar3 me-2 text-secondary"></i>
+                            ${b.preferred_date || '-'}
+                        </td>
+                        <td>
+                            <span class="badge badge-modern bg-${getStatusColor(status)} text-white">
+                                ${status}
+                            </span>
+                        </td>
+                        <td>
+                            ${mechanicName ? 
+                                `<div class="d-flex align-items-center">
+                                    <i class="bi bi-person-badge me-2 text-success"></i>
+                                    <span>${mechanicName}</span>
+                                </div>` : 
+                                '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Not Assigned</span>'
+                            }
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-primary btn-modern" onclick="openAssignModal(${b.id})" 
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                <i class="bi bi-person-plus me-1"></i>Assign
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById("booking-table-body").innerHTML = rows;
+    } catch (error) {
+        console.error("Error loading bookings:", error);
+        document.getElementById("booking-table-body").innerHTML = 
+            '<tr><td colspan="8" class="text-danger">Error loading bookings: ' + error.message + '</td></tr>';
+    }
+}
+
+function getStatusColor(status) {
+    switch(status) {
+        case 'pending': return 'warning';
+        case 'in_progress': return 'info';
+        case 'completed': return 'success';
+        case 'cancelled': return 'danger';
+        default: return 'secondary';
+    }
+}
+
+
+/* OPEN ASSIGN MODAL */
+async function openAssignModal(bookingId) {
+    try {
+        document.getElementById("assign-booking-id").value = bookingId;
+
+        const token = await refreshAccessToken();
+        if (!token) return;
+
+        const res = await fetch("/api/users/?role=mechanic", {
+            headers: { Authorization: "Bearer " + token }
+        });
+
+        if (!res.ok) {
+            alert("Failed to load mechanics");
+            return;
+        }
+
+        const data = await res.json();
+        // Handle paginated response or array
+        const mechanics = Array.isArray(data) ? data : (data.results || []);
+        
+        let options = '<option value="">Select Mechanic</option>';
+
+        mechanics.forEach(m => {
+            options += `<option value="${m.id}">${m.username}</option>`;
+        });
+
+        document.getElementById("mechanic-dropdown").innerHTML = options;
+
+        new bootstrap.Modal(document.getElementById("assignMechanicModal")).show();
+    } catch (error) {
+        console.error("Error loading mechanics:", error);
+        alert("Error loading mechanics: " + error.message);
+    }
+}
+
+
+/* ASSIGN MECHANIC */
+async function assignMechanic() {
+    try {
+        const token = await refreshAccessToken();
+        if (!token) return;
+
+        const bookingId = document.getElementById("assign-booking-id").value;
+        const mechanicId = document.getElementById("mechanic-dropdown").value;
+
+        if (!mechanicId) {
+            alert("Please select a mechanic");
+            return;
+        }
+
+        const res = await fetch(`/api/bookings/${bookingId}/assign/`, {
+            method: "PUT",
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ mechanic_id: mechanicId })
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            alert(`Failed to assign mechanic: ${errorData.detail || errorData.error || res.statusText}`);
+            return;
+        }
+
+        bootstrap.Modal.getInstance(document.getElementById("assignMechanicModal")).hide();
+        loadBookings();
+    } catch (error) {
+        console.error("Error assigning mechanic:", error);
+        alert("Error assigning mechanic: " + error.message);
+    }
+}
+
+
+// Chart instances
+let bookingsStatusChart = null;
+let serviceTypesChart = null;
+let monthlyTrendChart = null;
+let usersRoleChart = null;
+
+/* LOAD CHARTS DATA */
+async function loadChartsData() {
+    try {
+        const token = await refreshAccessToken();
+        if (!token) return;
+
+        // Fetch bookings data
+        const bookingsRes = await fetch("/api/bookings/", {
+            headers: { Authorization: "Bearer " + token }
+        });
+
+        if (!bookingsRes.ok) {
+            console.error("Failed to load bookings for charts");
+            return;
+        }
+
+        const bookingsData = await bookingsRes.json();
+        const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData.results || []);
+
+        // Fetch users data
+        const usersRes = await fetch("/api/users/", {
+            headers: { Authorization: "Bearer " + token }
+        });
+
+        let users = [];
+        if (usersRes.ok) {
+            const usersData = await usersRes.json();
+            users = Array.isArray(usersData) ? usersData : (usersData.results || []);
+        }
+
+        // Process data for charts
+        processChartsData(bookings, users);
+    } catch (error) {
+        console.error("Error loading charts data:", error);
+    }
+}
+
+function processChartsData(bookings, users) {
+    // 1. Bookings by Status
+    const statusCounts = {
+        'pending': 0,
+        'in_progress': 0,
+        'completed': 0,
+        'cancelled': 0
+    };
+
+    bookings.forEach(b => {
+        const status = b.status || 'pending';
+        if (statusCounts.hasOwnProperty(status)) {
+            statusCounts[status]++;
+        }
+    });
+
+    // 2. Service Types Distribution
+    const serviceTypes = {};
+    bookings.forEach(b => {
+        const type = b.service_type || 'unknown';
+        serviceTypes[type] = (serviceTypes[type] || 0) + 1;
+    });
+
+    // 3. Monthly Bookings Trend (last 6 months)
+    const monthlyData = getMonthlyTrend(bookings);
+
+    // 4. Users by Role
+    const roleCounts = {
+        'admin': 0,
+        'mechanic': 0,
+        'customer': 0
+    };
+
+    users.forEach(u => {
+        const role = u.role || 'customer';
+        if (roleCounts.hasOwnProperty(role)) {
+            roleCounts[role]++;
+        }
+    });
+
+    // Create charts
+    createBookingsStatusChart(statusCounts);
+    createServiceTypesChart(serviceTypes);
+    createMonthlyTrendChart(monthlyData);
+    createUsersRoleChart(roleCounts);
+}
+
+function getMonthlyTrend(bookings) {
+    const months = [];
+    const counts = [];
+    const now = new Date();
+    
+    // Get last 6 months
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthName = date.toLocaleString('default', { month: 'short' });
+        months.push(monthName);
+        
+        // Count bookings in this month
+        const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+        const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        
+        const count = bookings.filter(b => {
+            if (!b.created_at) return false;
+            const bookingDate = new Date(b.created_at);
+            return bookingDate >= monthStart && bookingDate <= monthEnd;
+        }).length;
+        
+        counts.push(count);
+    }
+    
+    return { months, counts };
+}
+
+function createBookingsStatusChart(statusCounts) {
+    const ctx = document.getElementById('bookingsStatusChart');
+    if (!ctx) return;
+
+    if (bookingsStatusChart) {
+        bookingsStatusChart.destroy();
+    }
+
+    bookingsStatusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'In Progress', 'Completed', 'Cancelled'],
+            datasets: [{
+                data: [
+                    statusCounts.pending,
+                    statusCounts.in_progress,
+                    statusCounts.completed,
+                    statusCounts.cancelled
+                ],
+                backgroundColor: [
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(13, 110, 253, 0.8)',
+                    'rgba(25, 135, 84, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ],
+                borderColor: [
+                    'rgb(255, 193, 7)',
+                    'rgb(13, 110, 253)',
+                    'rgb(25, 135, 84)',
+                    'rgb(220, 53, 69)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createServiceTypesChart(serviceTypes) {
+    const ctx = document.getElementById('serviceTypesChart');
+    if (!ctx) return;
+
+    if (serviceTypesChart) {
+        serviceTypesChart.destroy();
+    }
+
+    const labels = Object.keys(serviceTypes).map(key => {
+        return key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ');
+    });
+    const data = Object.values(serviceTypes);
+
+    serviceTypesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Number of Bookings',
+                data: data,
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Bookings: ${context.parsed.y}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createMonthlyTrendChart(monthlyData) {
+    const ctx = document.getElementById('monthlyTrendChart');
+    if (!ctx) return;
+
+    if (monthlyTrendChart) {
+        monthlyTrendChart.destroy();
+    }
+
+    monthlyTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: monthlyData.months,
+            datasets: [{
+                label: 'Bookings',
+                data: monthlyData.counts,
+                borderColor: 'rgba(102, 126, 234, 1)',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Bookings: ${context.parsed.y}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createUsersRoleChart(roleCounts) {
+    const ctx = document.getElementById('usersRoleChart');
+    if (!ctx) return;
+
+    if (usersRoleChart) {
+        usersRoleChart.destroy();
+    }
+
+    usersRoleChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Admin', 'Mechanic', 'Customer'],
+            datasets: [{
+                data: [
+                    roleCounts.admin,
+                    roleCounts.mechanic,
+                    roleCounts.customer
+                ],
+                backgroundColor: [
+                    'rgba(220, 53, 69, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(13, 110, 253, 0.8)'
+                ],
+                borderColor: [
+                    'rgb(220, 53, 69)',
+                    'rgb(255, 193, 7)',
+                    'rgb(13, 110, 253)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+/* INITIAL LOAD */
+loadSummary();
+loadBookings();
+loadChartsData();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Vehicles - AutoCare</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-color: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            background: #f8fafc;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 1400px;
+            padding: 30px;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-modern {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-modern .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .btn-modern {
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .table-modern {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table-modern tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-modern tbody tr:hover {
+            background-color: #f1f5f9;
+            transform: scale(1.01);
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-car-front-fill"></i> Manage Vehicles</h1>
+                <p class="mb-0 opacity-75">View and manage all registered vehicles</p>
+            </div>
+            <button class="btn back-btn" onclick="history.back()">
+                <i class="bi bi-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Vehicle Button -->
+    <div class="mb-4">
+        <button class="btn btn-modern text-white" data-bs-toggle="modal" data-bs-target="#vehicleModal" onclick="openAddVehicle()" 
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="bi bi-plus-circle-fill me-2"></i>Add Vehicle
+        </button>
+    </div>
+
+    <!-- Vehicles Table -->
+    <div class="card card-modern">
+        <div class="card-header">
+            <i class="bi bi-list-ul me-2"></i> All Vehicles
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-modern table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Customer</th>
+                            <th>Model</th>
+                            <th>Registration No</th>
+                            <th>Last Service</th>
+                            <th>Mileage</th>
+                            <th>Next Service Due</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehiclesTable">
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading vehicles...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Vehicle Modal -->
+<div class="modal fade" id="vehicleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0;">
+                <h5 id="modalTitle" class="modal-title">
+                    <i class="bi bi-car-front me-2"></i>Add Vehicle
+                </h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <form id="vehicleForm">
+                    <input type="hidden" id="vehicleId">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-person me-2"></i>Customer (User ID)
+                        </label>
+                        <input type="number" id="userId" class="form-control form-control-lg" style="border-radius: 10px;" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-car-front me-2"></i>Model
+                        </label>
+                        <input type="text" id="model" class="form-control form-control-lg" style="border-radius: 10px;" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-123 me-2"></i>Registration Number
+                        </label>
+                        <input type="text" id="registration_no" class="form-control form-control-lg" style="border-radius: 10px;" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-calendar3 me-2"></i>Last Service Date
+                            </label>
+                            <input type="date" id="last_service_date" class="form-control form-control-lg" style="border-radius: 10px;">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-speedometer2 me-2"></i>Mileage
+                            </label>
+                            <input type="number" id="mileage" class="form-control form-control-lg" style="border-radius: 10px;">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">
+                            <i class="bi bi-calendar-check me-2"></i>Next Service Due
+                        </label>
+                        <input type="date" id="next_service_due" class="form-control form-control-lg" style="border-radius: 10px;">
+                    </div>
+
+                    <button class="btn btn-modern text-white w-100" type="submit" 
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="bi bi-check-circle me-2"></i>Save
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* -----------------------------
+    INITIAL SETUP
+----------------------------- */
+const token = localStorage.getItem("access");
+const userRole = localStorage.getItem("role");
+
+if (!token) {
+    window.location.href = "/login/";
+}
+
+if (userRole !== "admin") {
+    alert("Access denied. Only administrators can manage vehicles.");
+    window.location.href = "/dashboard/admin/";
+}
+
+function getAuthHeader() {
+    const token = localStorage.getItem("access");
+    if (!token) {
+        window.location.href = "/login/";
+        return null;
+    }
+    return {
+        "Authorization": "Bearer " + token
+    };
+}
+
+async function refreshAccessToken() {
+    const refresh = localStorage.getItem("refresh");
+    if (!refresh) {
+        window.location.href = "/login/";
+        return null;
+    }
+    try {
+        const res = await fetch("/api/token/refresh/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh: refresh })
+        });
+        if (!res.ok) {
+            window.location.href = "/login/";
+            return null;
+        }
+        const data = await res.json();
+        localStorage.setItem("access", data.access);
+        return data.access;
+    } catch (error) {
+        console.error("Token refresh error:", error);
+        window.location.href = "/login/";
+        return null;
+    }
+}
+
+/* FETCH VEHICLES */
+async function fetchVehicles() {
+    try {
+        let token = localStorage.getItem("access");
+        if (!token) {
+            window.location.href = "/login/";
+            return;
+        }
+
+        const res = await fetch("/api/vehicles/", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (res.status === 401) {
+            token = await refreshAccessToken();
+            if (!token) return;
+            
+            const retryRes = await fetch("/api/vehicles/", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (!retryRes.ok) {
+                document.getElementById("vehiclesTable").innerHTML = 
+                    '<tr><td colspan="8" class="text-danger">Failed to load vehicles. Please login again.</td></tr>';
+                return;
+            }
+            const retryData = await retryRes.json();
+            displayVehicles(retryData);
+            return;
+        }
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            let errorMessage = `Failed to load vehicles. Status: ${res.status}`;
+            if (res.status === 403) {
+                errorMessage = "Access denied. You must be an admin to view vehicles.";
+            } else if (errorData.detail) {
+                errorMessage = errorData.detail;
+            }
+            document.getElementById("vehiclesTable").innerHTML = 
+                `<tr><td colspan="8" class="text-danger">${errorMessage}</td></tr>`;
+            return;
+        }
+
+        const data = await res.json();
+        displayVehicles(data);
+
+    } catch (error) {
+        console.error("Error fetching vehicles:", error);
+        document.getElementById("vehiclesTable").innerHTML = 
+            '<tr><td colspan="8" class="text-danger">Error: ' + error.message + '</td></tr>';
+    }
+}
+
+function displayVehicles(data) {
+    const vehicles = Array.isArray(data) ? data : (data.results || []);
+    
+    let rows = "";
+    if (vehicles.length === 0) {
+        rows = '<tr><td colspan="8" class="text-center">No vehicles found</td></tr>';
+    } else {
+        vehicles.forEach(v => {
+            const model = escapeHtml(v.model || '-');
+            const reg = escapeHtml(v.registration_no || '-');
+            const username = escapeHtml(v.username || '-');
+            
+            rows += `
+                <tr>
+                    <td class="ps-4 fw-semibold">#${v.id}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-circle me-2 text-primary"></i>
+                            <span>${username}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-car-front me-2 text-info"></i>
+                            <span>${model}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark border">${reg}</span>
+                    </td>
+                    <td>
+                        <i class="bi bi-calendar3 me-2 text-secondary"></i>
+                        ${v.last_service_date || "-"}
+                    </td>
+                    <td>
+                        <i class="bi bi-speedometer2 me-2 text-info"></i>
+                        ${v.mileage || "-"}
+                    </td>
+                    <td>
+                        ${v.next_service_due ? 
+                            `<i class="bi bi-clock me-2 text-warning"></i>${v.next_service_due}` : 
+                            '<span class="text-muted">N/A</span>'
+                        }
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-warning btn-modern me-1" onclick="openEditVehicle(${v.id}, ${v.user_id || v.user || ''}, '${model.replace(/'/g, "\\'")}', '${reg.replace(/'/g, "\\'")}', '${v.last_service_date || ''}', '${v.mileage || ''}', '${v.next_service_due || ''}')">
+                            <i class="bi bi-pencil me-1"></i>Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-modern" onclick="deleteVehicle(${v.id})">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    document.getElementById("vehiclesTable").innerHTML = rows;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+/* OPEN ADD */
+function openAddVehicle() {
+    document.getElementById("vehicleForm").reset();
+    document.getElementById("modalTitle").innerHTML = '<i class="bi bi-car-front me-2"></i>Add Vehicle';
+    document.getElementById("vehicleId").value = "";
+}
+
+/* OPEN EDIT */
+function openEditVehicle(id, userId, model, reg, last, mileage, next) {
+    document.getElementById("modalTitle").innerHTML = '<i class="bi bi-pencil-square me-2"></i>Edit Vehicle';
+    document.getElementById("vehicleId").value = id;
+    document.getElementById("userId").value = userId || '';
+    document.getElementById("model").value = model || '';
+    document.getElementById("registration_no").value = reg || '';
+    document.getElementById("last_service_date").value = last || '';
+    document.getElementById("mileage").value = mileage || '';
+    document.getElementById("next_service_due").value = next || '';
+
+    new bootstrap.Modal(document.getElementById("vehicleModal")).show();
+}
+
+/* SUBMIT FORM (Add/Update) */
+document.getElementById("vehicleForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById("vehicleId").value;
+    const userId = document.getElementById("userId").value;
+    
+    if (!userId) {
+        alert("Please enter a Customer (User ID)");
+        return;
+    }
+    
+    const data = {
+        user: parseInt(userId),
+        model: document.getElementById("model").value,
+        registration_no: document.getElementById("registration_no").value,
+        last_service_date: document.getElementById("last_service_date").value || null,
+        mileage: document.getElementById("mileage").value || null,
+        next_service_due: document.getElementById("next_service_due").value || null
+    };
+
+    const authHeader = getAuthHeader();
+    if (!authHeader) return;
+
+    try {
+        let token = localStorage.getItem("access");
+        const res = await fetch(id ? `/api/vehicles/${id}/` : "/api/vehicles/", {
+            method: id ? "PUT" : "POST",
+            headers: {
+                ...authHeader,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (res.status === 401) {
+            token = await refreshAccessToken();
+            if (!token) return;
+            
+            const retryRes = await fetch(id ? `/api/vehicles/${id}/` : "/api/vehicles/", {
+                method: id ? "PUT" : "POST",
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (!retryRes.ok) {
+                const errorData = await retryRes.json().catch(() => ({}));
+                alert(`Failed to save vehicle: ${errorData.detail || retryRes.statusText || 'Unknown error'}`);
+                return;
+            }
+        } else if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            alert(`Failed to save vehicle: ${errorData.detail || res.statusText || 'Unknown error'}`);
+            return;
+        }
+
+        bootstrap.Modal.getInstance(document.getElementById("vehicleModal")).hide();
+        fetchVehicles();
+    } catch (error) {
+        alert("Error saving vehicle: " + error.message);
+        console.error("Save error:", error);
+    }
+});
+
+/* DELETE VEHICLE */
+async function deleteVehicle(id) {
+    if (!confirm("Are you sure you want to delete this vehicle?")) return;
+
+    const authHeader = getAuthHeader();
+    if (!authHeader) return;
+
+    try {
+        let token = localStorage.getItem("access");
+        const res = await fetch(`/api/vehicles/${id}/`, {
+            method: "DELETE",
+            headers: authHeader
+        });
+
+        if (res.status === 401) {
+            token = await refreshAccessToken();
+            if (!token) return;
+            
+            const retryRes = await fetch(`/api/vehicles/${id}/`, {
+                method: "DELETE",
+                headers: { "Authorization": "Bearer " + token }
+            });
+            
+            if (!retryRes.ok) {
+                const errorData = await retryRes.json().catch(() => ({}));
+                alert(`Failed to delete vehicle: ${errorData.detail || retryRes.statusText || 'Unknown error'}`);
+                return;
+            }
+        } else if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            alert(`Failed to delete vehicle: ${errorData.detail || res.statusText || 'Unknown error'}`);
+            return;
+        }
+
+        fetchVehicles();
+    } catch (error) {
+        alert("Error deleting vehicle: " + error.message);
+        console.error("Delete error:", error);
+    }
+}
+
+fetchVehicles();
+</script>
+
+</body>
+</html>

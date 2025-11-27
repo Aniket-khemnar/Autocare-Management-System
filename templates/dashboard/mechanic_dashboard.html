@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mechanic Dashboard - AutoCare</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-color: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            background: #f8fafc;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 1400px;
+            padding: 30px;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .stat-card {
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 3rem;
+            opacity: 0.3;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+
+        .stat-card .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-modern {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-modern .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .btn-modern {
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .table-modern {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table-modern tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-modern tbody tr:hover {
+            background-color: #f1f5f9;
+            transform: scale(1.01);
+        }
+
+        .badge-modern {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .stat-card .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-wrench-adjustable"></i> Mechanic Dashboard</h1>
+                <p class="mb-0 opacity-75">Welcome back, <span id="usernameDisplay"></span>! Here's your work overview.</p>
+            </div>
+            <button class="btn logout-btn" onclick="logoutUser()">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="bi bi-briefcase-fill stat-icon"></i>
+                <div class="stat-label">Total Assigned</div>
+                <div class="stat-number" id="totalAssigned">0</div>
+                <small class="opacity-75">All jobs</small>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="bi bi-gear-fill stat-icon"></i>
+                <div class="stat-label">Active Jobs</div>
+                <div class="stat-number" id="activeJobs">0</div>
+                <small class="opacity-75">In progress</small>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card text-white" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="bi bi-clock-history stat-icon"></i>
+                <div class="stat-label">Pending</div>
+                <div class="stat-number" id="pendingJobs">0</div>
+                <small class="opacity-75">Awaiting start</small>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card text-white" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="bi bi-check-circle-fill stat-icon"></i>
+                <div class="stat-label">Completed</div>
+                <div class="stat-number" id="completedJobs">0</div>
+                <small class="opacity-75">This week</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Bookings Table -->
+    <div class="card card-modern mb-4">
+        <div class="card-header">
+            <i class="bi bi-list-ul me-2"></i> My Assigned Bookings
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-modern table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th>Service Type</th>
+                            <th>Preferred Date</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-table-body">
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading bookings...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0;">
+                <h5 class="modal-title" id="updateStatusModalLabel">
+                    <i class="bi bi-pencil-square me-2"></i>Update Booking Status
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="update-booking-id">
+                <div class="mb-3">
+                    <label for="statusSelect" class="form-label fw-semibold">
+                        <i class="bi bi-flag-fill me-2"></i>Status
+                    </label>
+                    <select id="statusSelect" class="form-select form-select-lg" style="border-radius: 10px;">
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="notesInput" class="form-label fw-semibold">
+                        <i class="bi bi-sticky-fill me-2"></i>Notes (Optional)
+                    </label>
+                    <textarea id="notesInput" class="form-control" rows="3" style="border-radius: 10px;" placeholder="Add any notes about this booking..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: none; padding: 20px 25px;">
+                <button type="button" class="btn btn-secondary btn-modern" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary btn-modern text-white" id="confirmUpdateStatus" 
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="bi bi-check-circle me-2"></i>Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* AUTH & LOGOUT */
+if (!localStorage.getItem("access")) {
+    window.location.href = "/login/";
+}
+
+document.getElementById("usernameDisplay").textContent = localStorage.getItem("username") || "Mechanic";
+
+function logoutUser() {
+    localStorage.clear();
+    window.location.href = "/login/";
+}
+
+async function refreshAccessToken() {
+    const refresh = localStorage.getItem("refresh");
+    if (!refresh) return logoutUser();
+
+    const res = await fetch("/api/token/refresh/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh })
+    });
+
+    if (!res.ok) return logoutUser();
+    const data = await res.json();
+
+    localStorage.setItem("access", data.access);
+    return data.access;
+}
+
+/* LOAD SUMMARY */
+async function loadSummary() {
+    const token = await refreshAccessToken();
+    if (!token) return;
+
+    try {
+        const res = await fetch("/api/bookings/mechanic-summary/", {
+            headers: { Authorization: "Bearer " + token }
+        });
+
+        if (!res.ok) {
+            console.error("Failed to load summary:", res.status);
+            return;
+        }
+
+        const data = await res.json();
+        const counts = data.counts || {};
+
+        document.getElementById("totalAssigned").innerHTML = counts.total_assigned || 0;
+        document.getElementById("activeJobs").innerHTML = counts.active_jobs || 0;
+        document.getElementById("pendingJobs").innerHTML = counts.pending_jobs || 0;
+        document.getElementById("completedJobs").innerHTML = counts.completed_week || 0;
+    } catch (error) {
+        console.error("Error loading summary:", error);
+    }
+}
+
+/* LOAD BOOKINGS */
+async function loadBookings() {
+    try {
+        const token = await refreshAccessToken();
+        if (!token) return;
+
+        const res = await fetch("/api/bookings/", {
+            headers: { Authorization: "Bearer " + token }
+        });
+
+        if (!res.ok) {
+            console.error("Failed to load bookings:", res.status);
+            document.getElementById("bookings-table-body").innerHTML = 
+                '<tr><td colspan="7" class="text-danger">Failed to load bookings</td></tr>';
+            return;
+        }
+
+        const data = await res.json();
+        const bookings = Array.isArray(data) ? data : (data.results || []);
+        
+        let rows = "";
+        
+        if (bookings.length === 0) {
+            rows = '<tr><td colspan="7" class="text-center">No bookings assigned yet</td></tr>';
+        } else {
+            bookings.forEach(b => {
+                const customerName = b.customer?.username || '-';
+                const vehicleModel = b.vehicle?.model || '-';
+                const vehicleReg = b.vehicle?.registration_no || '-';
+                const status = b.status || 'pending';
+                
+                rows += `
+                    <tr>
+                        <td class="ps-4 fw-semibold">#${b.id}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-circle me-2 text-primary"></i>
+                                <span>${escapeHtml(customerName)}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-car-front me-2 text-info"></i>
+                                <div>
+                                    <div class="fw-semibold">${escapeHtml(vehicleModel)}</div>
+                                    <small class="text-muted">${escapeHtml(vehicleReg)}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">${escapeHtml(b.service_type || '-')}</span>
+                        </td>
+                        <td>
+                            <i class="bi bi-calendar3 me-2 text-secondary"></i>
+                            ${b.preferred_date || '-'}
+                        </td>
+                        <td>
+                            <span class="badge badge-modern bg-${getStatusColor(status)} text-white">
+                                ${status}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-primary btn-modern" onclick="openUpdateStatusModal(${b.id}, '${status}', '${(b.notes || '').replace(/'/g, "\\'")}')" 
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                <i class="bi bi-pencil me-1"></i>Update Status
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById("bookings-table-body").innerHTML = rows;
+    } catch (error) {
+        console.error("Error loading bookings:", error);
+        document.getElementById("bookings-table-body").innerHTML = 
+            '<tr><td colspan="7" class="text-danger">Error loading bookings: ' + error.message + '</td></tr>';
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function getStatusColor(status) {
+    switch(status) {
+        case 'pending': return 'warning';
+        case 'in_progress': return 'info';
+        case 'completed': return 'success';
+        case 'cancelled': return 'danger';
+        default: return 'secondary';
+    }
+}
+
+/* UPDATE STATUS MODAL */
+function openUpdateStatusModal(id, currentStatus, currentNotes) {
+    document.getElementById("update-booking-id").value = id;
+    document.getElementById("statusSelect").value = currentStatus;
+    document.getElementById("notesInput").value = currentNotes || "";
+    new bootstrap.Modal(document.getElementById("updateStatusModal")).show();
+}
+
+document.getElementById("confirmUpdateStatus").addEventListener("click", async () => {
+    const bookingId = document.getElementById("update-booking-id").value;
+    if (!bookingId) return;
+
+    const token = await refreshAccessToken();
+    if (!token) return;
+
+    const status = document.getElementById("statusSelect").value;
+    const notes = document.getElementById("notesInput").value;
+
+    try {
+        const res = await fetch(`/api/bookings/${bookingId}/update_status/`, {
+            method: "PATCH",
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ status, notes })
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            alert(`Failed to update status: ${errorData.detail || errorData.error || res.statusText}`);
+            return;
+        }
+
+        alert(`Booking status updated to ${status}`);
+        loadBookings();
+        loadSummary();
+        bootstrap.Modal.getInstance(document.getElementById("updateStatusModal")).hide();
+    } catch (error) {
+        console.error("Error updating booking status:", error);
+        alert("Error updating booking status: " + error.message);
+    }
+});
+
+/* INITIAL LOAD */
+loadSummary();
+loadBookings();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

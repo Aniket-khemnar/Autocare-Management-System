@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings - AutoCare</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --dark-color: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            background: #f8fafc;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin: 20px auto;
+            max-width: 1400px;
+            padding: 30px;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-modern {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .card-modern .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .btn-modern {
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .table-modern {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .table-modern tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-modern tbody tr:hover {
+            background-color: #f1f5f9;
+            transform: scale(1.01);
+        }
+
+        .badge-modern {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .table-responsive { max-height: 70vh; overflow-y: auto; }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-calendar-check-fill"></i> Manage Bookings</h1>
+                <p class="mb-0 opacity-75">View and manage all service bookings</p>
+            </div>
+            <button class="btn back-btn" onclick="history.back()">
+                <i class="bi bi-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Booking Button -->
+    <div class="mb-4">
+        <button class="btn btn-modern text-white" data-bs-toggle="modal" data-bs-target="#addBookingModal" 
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="bi bi-plus-circle-fill me-2"></i>Add Booking
+        </button>
+    </div>
+
+    <!-- BOOKING TABLE -->
+    <div class="card card-modern">
+        <div class="card-header">
+            <i class="bi bi-list-ul me-2"></i> All Bookings
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-modern table-hover align-middle mb-0" id="bookingTable">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th>Service Type</th>
+                            <th>Status</th>
+                            <th>Assigned Mechanic</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingBody">
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading bookings...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ADD BOOKING MODAL -->
+<div class="modal fade" id="addBookingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0;">
+                <h5 class="modal-title">
+                    <i class="bi bi-calendar-plus-fill me-2"></i>Add Booking
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <form id="addBookingForm">
+
+                    <!-- Customer -->
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-person me-2"></i>Select Customer <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select form-select-lg mb-3" id="customerSelect" required style="border-radius: 10px;">
+                        <option value="">-- Select Customer --</option>
+                    </select>
+
+                    <!-- Vehicle -->
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-car-front me-2"></i>Select Vehicle <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select form-select-lg mb-3" id="vehicleSelect" required disabled style="border-radius: 10px;">
+                        <option value="">-- Select Customer First --</option>
+                    </select>
+
+                    <!-- Service Type -->
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-wrench-adjustable me-2"></i>Service Type <span class="text-danger">*</span>
+                    </label>
+                    <select class="form-select form-select-lg mb-3" id="addServiceType" required style="border-radius: 10px;">
+                        <option value="">-- Select Service Type --</option>
+                        <option value="general">General Service</option>
+                        <option value="oil_change">Oil Change</option>
+                        <option value="repair">Repair</option>
+                        <option value="custom">Custom Request</option>
+                    </select>
+
+                    <!-- Preferred Date -->
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-calendar3 me-2"></i>Preferred Date <span class="text-danger">*</span>
+                    </label>
+                    <input type="date" class="form-control form-control-lg mb-3" id="addPreferredDate" required style="border-radius: 10px;">
+
+                    <!-- Mechanic (Optional) -->
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-person-badge me-2"></i>Assign Mechanic (Optional)
+                    </label>
+                    <select class="form-select form-select-lg mb-3" id="mechanicSelect" style="border-radius: 10px;">
+                        <option value="">-- No Mechanic Assigned --</option>
+                    </select>
+
+                </form>
+            </div>
+
+            <div class="modal-footer" style="border-top: none; padding: 20px 25px;">
+                <button class="btn btn-secondary btn-modern" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </button>
+                <button class="btn btn-modern text-white" onclick="createBooking()" 
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="bi bi-check-circle me-2"></i>Create
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- EDIT BOOKING MODAL -->
+<div class="modal fade" id="editBookingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px 15px 0 0;">
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square me-2"></i>Edit Booking
+                </h5>
+                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <form id="editBookingForm">
+
+                    <input type="hidden" id="editBookingId">
+
+                    <!-- Status -->
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-flag-fill me-2"></i>Update Status
+                    </label>
+                    <select class="form-select form-select-lg mb-3" id="editStatus" style="border-radius: 10px;">
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+
+                    <!-- Mechanic -->
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-person-badge me-2"></i>Assign Mechanic
+                    </label>
+                    <select class="form-select form-select-lg mb-3" id="editMechanic" style="border-radius: 10px;"></select>
+
+                </form>
+            </div>
+
+            <div class="modal-footer" style="border-top: none; padding: 20px 25px;">
+                <button class="btn btn-secondary btn-modern" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </button>
+                <button class="btn btn-modern text-white" onclick="updateBooking()" 
+                        style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);">
+                    <i class="bi bi-check-circle me-2"></i>Update
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- DELETE CONFIRMATION -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content text-center" style="border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div class="modal-body p-4">
+                <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
+                <h5 class="mt-3">Delete Booking?</h5>
+                <p class="text-muted">This action cannot be undone.</p>
+                <input type="hidden" id="deleteBookingId">
+            </div>
+
+            <div class="modal-footer d-flex justify-content-around" style="border-top: none; padding: 20px 25px;">
+                <button class="btn btn-secondary btn-modern" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </button>
+                <button class="btn btn-danger btn-modern" onclick="deleteBooking()">
+                    <i class="bi bi-trash me-2"></i>Delete
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Bootstrap + JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ---- API BASE URL ----
+const API = "/api";
+
+// ========== TOKEN MANAGEMENT ==========
+function getAccessToken() {
+    return localStorage.getItem("access");
+}
+
+async function refreshAccessToken() {
+    const refresh = localStorage.getItem("refresh");
+    if (!refresh) {
+        window.location.href = "/login/";
+        return null;
+    }
+    
+    try {
+        const res = await fetch(`${API}/token/refresh/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem("access", data.access);
+            return data.access;
+        } else {
+            window.location.href = "/login/";
+            return null;
+        }
+    } catch (error) {
+        console.error("Token refresh failed:", error);
+        window.location.href = "/login/";
+        return null;
+    }
+}
+
+async function apiFetch(url, options = {}) {
+    let token = getAccessToken();
+    if (!token) {
+        token = await refreshAccessToken();
+        if (!token) return null;
+    }
+
+    const defaultHeaders = {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+    };
+
+    const response = await fetch(url, {
+        ...options,
+        headers: { ...defaultHeaders, ...options.headers }
+    });
+
+    // If 401, try refreshing token once
+    if (response.status === 401) {
+        token = await refreshAccessToken();
+        if (token) {
+            return fetch(url, {
+                ...options,
+                headers: { ...defaultHeaders, ...options.headers, "Authorization": `Bearer ${token}` }
+            });
+        }
+    }
+
+    return response;
+}
+
+// ========== LOAD BOOKINGS ==========
+async function loadBookings() {
+    try {
+        const response = await apiFetch(`${API}/bookings/`);
+        if (!response) return;
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load bookings: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const tbody = document.getElementById("bookingBody");
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No bookings found</td></tr>`;
+            return;
+        }
+
+        data.forEach(b => {
+            const statusBadge = getStatusBadge(b.status);
+            const customerName = b.customer ? b.customer.username : "N/A";
+            const vehicleModel = b.vehicle ? b.vehicle.model : "N/A";
+            const vehicleReg = b.vehicle ? b.vehicle.registration_no : "";
+            const mechanicName = b.mechanic ? b.mechanic.username : "Not Assigned";
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td class="ps-4 fw-semibold">#${b.id}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-circle me-2 text-primary"></i>
+                            <span>${escapeHtml(customerName)}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-car-front me-2 text-info"></i>
+                            <div>
+                                <div class="fw-semibold">${escapeHtml(vehicleModel)}</div>
+                                <small class="text-muted">${escapeHtml(vehicleReg)}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark border">${escapeHtml(b.service_type || "N/A")}</span>
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        ${mechanicName !== "Not Assigned" ? 
+                            `<div class="d-flex align-items-center">
+                                <i class="bi bi-person-badge me-2 text-success"></i>
+                                <span>${escapeHtml(mechanicName)}</span>
+                            </div>` : 
+                            '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Not Assigned</span>'
+                        }
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-warning btn-modern me-1" onclick="openEdit(${b.id})">
+                            <i class="bi bi-pencil me-1"></i>Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-modern" onclick="openDelete(${b.id})">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        console.error("Error loading bookings:", error);
+        document.getElementById("bookingBody").innerHTML = 
+            `<tr><td colspan="7" class="text-center text-danger">Error loading bookings: ${error.message}</td></tr>`;
+    }
+}
+
+function getStatusBadge(status) {
+    const badges = {
+        'pending': '<span class="badge badge-modern bg-warning text-dark">Pending</span>',
+        'in_progress': '<span class="badge badge-modern bg-info text-white">In Progress</span>',
+        'completed': '<span class="badge badge-modern bg-success text-white">Completed</span>',
+        'cancelled': '<span class="badge badge-modern bg-danger text-white">Cancelled</span>'
+    };
+    return badges[status] || `<span class="badge badge-modern bg-secondary text-white">${status}</span>`;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ========== LOAD ALL USERS (CUSTOMERS) ==========
+async function loadCustomers() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            console.log("Loading customers...");
+            // Load all users (not just customers) - admin can create bookings for any user
+            const response = await apiFetch(`${API}/users/`);
+            if (!response) {
+                console.error("No response from apiFetch for users");
+                reject(new Error("No response from server"));
+                return;
+            }
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Failed to load users:", response.status, errorText);
+                throw new Error(`Failed to load users: ${response.status} - ${errorText}`);
+            }
+            
+            const users = await response.json();
+            console.log("Users loaded:", users);
+            
+            const select = document.getElementById("customerSelect");
+            if (!select) {
+                console.error("customerSelect element not found");
+                reject(new Error("Customer select element not found"));
+                return;
+            }
+            
+            select.innerHTML = `<option value="">-- Select Customer --</option>`;
+
+            if (Array.isArray(users) && users.length > 0) {
+                users.forEach(u => {
+                    select.innerHTML += `<option value="${u.id}">${escapeHtml(u.username)} (${escapeHtml(u.email)})</option>`;
+                });
+            } else {
+                select.innerHTML += `<option value="" disabled>No users found</option>`;
+            }
+            
+            // Setup the change listener after populating dropdown
+            setupCustomerChangeListener();
+            resolve(users);
+        } catch (error) {
+            console.error("Error loading customers:", error);
+            const select = document.getElementById("customerSelect");
+            if (select) {
+                select.innerHTML = `<option value="">-- Error loading customers --</option>`;
+            }
+            alert("Failed to load customers: " + error.message);
+            reject(error);
+        }
+    });
+}
+
+// ========== LOAD VEHICLES BASED ON CUSTOMER ==========
+function loadVehiclesForCustomer(userId) {
+    const vehicleSelect = document.getElementById("vehicleSelect");
+    
+    if (!vehicleSelect) {
+        console.error("vehicleSelect element not found");
+        return;
+    }
+    
+    // Clear vehicle dropdown
+    vehicleSelect.innerHTML = `<option value="">-- Loading vehicles... --</option>`;
+    vehicleSelect.disabled = true;
+    
+    if (!userId) {
+        vehicleSelect.innerHTML = `<option value="">-- Select Customer First --</option>`;
+        return;
+    }
+
+    apiFetch(`${API}/vehicles/?user=${userId}`)
+        .then(response => {
+            if (!response) {
+                throw new Error("No response from server");
+            }
+            
+            if (!response.ok) {
+                return response.text().then(errorText => {
+                    console.error("Failed to load vehicles:", response.status, errorText);
+                    throw new Error(`Failed to load vehicles: ${response.status}`);
+                });
+            }
+            
+            return response.json();
+        })
+        .then(vehicles => {
+            console.log("Vehicles loaded:", vehicles);
+            
+            if (!vehicles || vehicles.length === 0) {
+                vehicleSelect.innerHTML = `<option value="">-- No vehicles found for this customer --</option>`;
+                vehicleSelect.disabled = true;
+                return;
+            }
+            
+            vehicleSelect.disabled = false;
+            vehicleSelect.innerHTML = `<option value="">-- Select Vehicle --</option>`;
+            vehicles.forEach(v => {
+                vehicleSelect.innerHTML += `<option value="${v.id}">${escapeHtml(v.model)} (${escapeHtml(v.registration_no)})</option>`;
+            });
+        })
+        .catch(error => {
+            console.error("Error loading vehicles:", error);
+            vehicleSelect.innerHTML = `<option value="">-- Error loading vehicles --</option>`;
+            alert("Failed to load vehicles for this customer: " + error.message);
+        });
+}
+
+function setupCustomerChangeListener() {
+    const customerSelect = document.getElementById("customerSelect");
+    if (!customerSelect) {
+        console.error("customerSelect element not found");
+        return;
+    }
+    
+    // Remove any existing listeners by cloning the element
+    const newSelect = customerSelect.cloneNode(true);
+    customerSelect.parentNode.replaceChild(newSelect, customerSelect);
+    
+    // Add event listener to the new element
+    newSelect.addEventListener("change", function () {
+        const userId = this.value;
+        loadVehiclesForCustomer(userId);
+    });
+    
+    console.log("Customer change listener attached");
+}
+
+// ========== LOAD MECHANICS ==========
+async function loadMechanics() {
+    try {
+        const response = await apiFetch(`${API}/users/?role=mechanic`);
+        if (!response) return;
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load mechanics: ${response.status}`);
+        }
+        
+        const mechanics = await response.json();
+        const addMech = document.getElementById("mechanicSelect");
+        const editMech = document.getElementById("editMechanic");
+
+        addMech.innerHTML = `<option value="">-- No Mechanic Assigned --</option>`;
+        editMech.innerHTML = `<option value="">-- No Mechanic Assigned --</option>`;
+
+        mechanics.forEach(m => {
+            addMech.innerHTML += `<option value="${m.id}">${escapeHtml(m.username)}</option>`;
+            editMech.innerHTML += `<option value="${m.id}">${escapeHtml(m.username)}</option>`;
+        });
+    } catch (error) {
+        console.error("Error loading mechanics:", error);
+    }
+}
+
+// ========== CREATE BOOKING ==========
+async function createBooking() {
+    const customerId = document.getElementById("customerSelect").value;
+    const vehicleId = document.getElementById("vehicleSelect").value;
+    const serviceType = document.getElementById("addServiceType").value;
+    const preferredDate = document.getElementById("addPreferredDate").value;
+    const mechanicId = document.getElementById("mechanicSelect").value;
+
+    // Validation
+    if (!customerId || !vehicleId || !serviceType || !preferredDate) {
+        alert("Please fill in all required fields (Customer, Vehicle, Service Type, and Preferred Date).");
+        return;
+    }
+
+    const data = {
+        customer_id: parseInt(customerId),
+        vehicle_id: parseInt(vehicleId),
+        service_type: serviceType,
+        preferred_date: preferredDate
+    };
+
+    // Add mechanic if selected
+    if (mechanicId) {
+        data.mechanic_id = parseInt(mechanicId);
+    }
+
+    try {
+        const response = await apiFetch(`${API}/bookings/`, {
+            method: "POST",
+            body: JSON.stringify(data)
+        });
+        
+        if (!response) return;
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || errorData.error || "Failed to create booking");
+        }
+
+        alert("Booking created successfully!");
+        loadBookings();
+        document.getElementById("addBookingForm").reset();
+        document.getElementById("vehicleSelect").disabled = true;
+        document.getElementById("vehicleSelect").innerHTML = `<option value="">-- Select Customer First --</option>`;
+        bootstrap.Modal.getInstance(document.getElementById("addBookingModal")).hide();
+    } catch (error) {
+        console.error("Error creating booking:", error);
+        alert("Failed to create booking: " + error.message);
+    }
+}
+
+// ========== OPEN EDIT MODAL ==========
+async function openEdit(id) {
+    try {
+        const response = await apiFetch(`${API}/bookings/${id}/`);
+        if (!response) return;
+        
+        if (!response.ok) {
+            throw new Error("Failed to load booking details");
+        }
+        
+        const b = await response.json();
+        document.getElementById("editBookingId").value = b.id;
+        document.getElementById("editStatus").value = b.status;
+        document.getElementById("editMechanic").value = b.mechanic ? b.mechanic.id : "";
+
+        new bootstrap.Modal(document.getElementById("editBookingModal")).show();
+    } catch (error) {
+        console.error("Error loading booking:", error);
+        alert("Failed to load booking details.");
+    }
+}
+
+// ========== UPDATE BOOKING ==========
+async function updateBooking() {
+    const id = document.getElementById("editBookingId").value;
+    const status = document.getElementById("editStatus").value;
+    const mechanicId = document.getElementById("editMechanic").value;
+
+    const data = {
+        status: status
+    };
+
+    // Add mechanic if selected
+    if (mechanicId) {
+        data.mechanic_id = parseInt(mechanicId);
+    }
+
+    try {
+        const response = await apiFetch(`${API}/bookings/${id}/`, {
+            method: "PATCH",
+            body: JSON.stringify(data)
+        });
+        
+        if (!response) return;
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || errorData.error || "Failed to update booking");
+        }
+
+        alert("Booking updated successfully!");
+        loadBookings();
+        bootstrap.Modal.getInstance(document.getElementById("editBookingModal")).hide();
+    } catch (error) {
+        console.error("Error updating booking:", error);
+        alert("Failed to update booking: " + error.message);
+    }
+}
+
+// ========== DELETE BOOKING ==========
+function openDelete(id) {
+    document.getElementById("deleteBookingId").value = id;
+    new bootstrap.Modal(document.getElementById("deleteModal")).show();
+}
+
+async function deleteBooking() {
+    const id = document.getElementById("deleteBookingId").value;
+
+    try {
+        const response = await apiFetch(`${API}/bookings/${id}/`, {
+            method: "DELETE"
+        });
+        
+        if (!response) return;
+
+        if (!response.ok) {
+            throw new Error("Failed to delete booking");
+        }
+
+        alert("Booking deleted successfully!");
+        loadBookings();
+        bootstrap.Modal.getInstance(document.getElementById("deleteModal")).hide();
+    } catch (error) {
+        console.error("Error deleting booking:", error);
+        alert("Failed to delete booking: " + error.message);
+    }
+}
+
+// ========== LOAD CUSTOMERS WHEN MODAL OPENS ==========
+const addBookingModal = document.getElementById("addBookingModal");
+if (addBookingModal) {
+    addBookingModal.addEventListener("show.bs.modal", function () {
+        console.log("Modal opened, loading customers and mechanics...");
+        
+        // Reset form first
+        const form = document.getElementById("addBookingForm");
+        if (form) form.reset();
+        
+        const vehicleSelect = document.getElementById("vehicleSelect");
+        if (vehicleSelect) {
+            vehicleSelect.disabled = true;
+            vehicleSelect.innerHTML = `<option value="">-- Select Customer First --</option>`;
+        }
+        
+        // Load customers (which will setup the listener) and mechanics
+        loadCustomers();
+        loadMechanics();
+    });
+} else {
+    console.error("addBookingModal element not found");
+}
+
+// ========== INITIAL LOAD ==========
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        loadBookings();
+        loadMechanics();
+    });
+} else {
+    loadBookings();
+    loadMechanics();
+}
+
+</script>
+
+</body>
+</html>

@@ -120,6 +120,24 @@ If you prefer automated setup:
 
 ## Troubleshooting
 
+### Poetry Detection Error (Build Fails)
+
+If you see errors about Poetry or "Collecting: command not found":
+
+**Quick Fix:**
+1. Go to Render dashboard → Your service → Environment tab
+2. Add environment variable:
+   - Key: `POETRY_VENV_PATH`
+   - Value: (leave blank/empty)
+3. Save and redeploy
+
+**Alternative:**
+Check your GitHub repository root for `pyproject.toml` or `poetry.lock` files. If they exist and you don't need Poetry:
+- Delete them from your repository
+- Commit and push the changes
+
+See `POETRY_FIX.md` for detailed instructions.
+
 ### Static Files Not Loading
 - ✅ WhiteNoise is already configured in `settings.py`
 - Ensure `build.sh` runs `collectstatic`

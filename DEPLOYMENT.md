@@ -1,6 +1,19 @@
 # Deployment Guide for Render
 
-This guide will help you deploy the AutoCare Django project on Render.
+⚠️ **This project is now configured to use SQLite database.**
+
+For SQLite deployment instructions, see **[DEPLOYMENT_SQLITE.md](DEPLOYMENT_SQLITE.md)** - it's much simpler!
+
+If you need MySQL instead, you'll need to:
+1. Add mysqlclient back to requirements.txt
+2. Update settings.py to use MySQL
+3. Set up an external MySQL database
+
+---
+
+# Legacy MySQL Deployment Guide (Deprecated - Using SQLite Now)
+
+This guide is kept for reference but the project now uses SQLite by default.
 
 ## Prerequisites
 
@@ -55,30 +68,68 @@ If you want to use Render's native PostgreSQL:
 
 ## Step 4: Configure Environment Variables
 
-In your Render web service, go to "Environment" tab and add:
+⚠️ **CRITICAL**: You MUST set these environment variables in the Render dashboard before deployment. The build will fail if database credentials are missing.
 
-### Required Variables:
+In your Render web service, go to **"Environment"** tab and click **"Add Environment Variable"** for each:
+
+### Required Database Variables (MUST BE SET):
+```
+DB_HOST=<your-actual-mysql-host>
+```
+**Example**: `us-east.connect.psdb.cloud` (PlanetScale) or `your-db.123456789.us-east-1.rds.amazonaws.com` (AWS RDS)
+**⚠️ DO NOT use placeholders like `<from-database-credentials>` - use actual values!**
+
+```
+DB_NAME=autocare_db
+```
+Your MySQL database name
+
+```
+DB_USER=<your-mysql-username>
+```
+Your MySQL username
+
+```
+DB_PASSWORD=<your-mysql-password>
+```
+Your MySQL password
+
+```
+DB_PORT=3306
+```
+MySQL port (usually 3306)
+
+### Other Required Variables:
 ```
 SECRET_KEY=<generate-a-secure-random-key>
+```
+Generate one using:
+```python
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+```
 DEBUG=False
+```
+
+```
 ALLOWED_HOSTS=your-app-name.onrender.com
-DB_NAME=autocare_db
-DB_USER=<from-database-credentials>
-DB_PASSWORD=<from-database-credentials>
-DB_HOST=<from-database-credentials>
-DB_PORT=3306
+```
+Replace with your actual Render domain
+
+```
 CSRF_TRUSTED_ORIGINS=https://your-app-name.onrender.com
+```
+Replace with your actual Render domain (include `https://`)
+
+```
 CORS_ALLOW_ALL_ORIGINS=False
 CSRF_COOKIE_SECURE=True
 SESSION_COOKIE_SECURE=True
 CSRF_COOKIE_HTTPONLY=True
 ```
 
-### Generating SECRET_KEY:
-You can generate a secure secret key using:
-```python
-python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-```
+**See `RENDER_ENV_SETUP.md` for detailed step-by-step instructions with screenshots guidance.**
 
 ## Step 5: Link Database to Web Service
 

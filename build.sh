@@ -8,6 +8,6 @@ pip install -r requirements.txt
 # Collect static files
 python manage.py collectstatic --no-input
 
-# Run migrations
+# Run migrations (SQLite database - no external setup needed)
 python manage.py migrate
 

@@ -2,19 +2,30 @@
 # exit on error
 set -o errexit
 
-# Disable Poetry (Render auto-detects it)
-unset POETRY_VENV_PATH
+# Explicitly disable Poetry completely
 export POETRY_VENV_PATH=""
-export PIP_DISABLE_PIP_VERSION_CHECK=1
-export PIP_NO_CACHE_DIR=1
+export SKIP_POETRY_INSTALL=true
+export PIP_USE_PEP517=false
+unset POETRY
 
-# Install dependencies using pip directly
-pip install --upgrade pip
-pip install -r requirements.txt
+# Ensure we're in the right directory (autocare folder)
+if [ -f "manage.py" ]; then
+    echo "Already in project root"
+else
+    echo "Changing to autocare directory"
+    cd autocare || exit 1
+fi
+
+# Install dependencies using pip (not Poetry)
+echo "Installing dependencies with pip..."
+python -m pip install --upgrade pip --quiet
+python -m pip install -r requirements.txt
 
 # Collect static files
+echo "Collecting static files..."
 python manage.py collectstatic --no-input
 
 # Run migrations (SQLite database - no external setup needed)
+echo "Running migrations..."
 python manage.py migrate
 

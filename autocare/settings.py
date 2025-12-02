@@ -27,7 +27,9 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-bh4hb#o)eh%8n4r^=5)ma
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+# ALLOWED_HOSTS: Comma-separated list of host/domain names
+_allowed_hosts = config('ALLOWED_HOSTS', default='localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in _allowed_hosts.split(',') if host.strip()]
 
 # Security settings for production
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=not DEBUG, cast=bool)
@@ -85,10 +87,12 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=DEBUG, cast=bool)
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = config(
+# CSRF_TRUSTED_ORIGINS: Comma-separated list of trusted origins for CSRF
+_csrf_trusted_origins = config(
     'CSRF_TRUSTED_ORIGINS',
     default='http://127.0.0.1:8000,http://localhost:8000,http://localhost,http://127.0.0.1'
-).split(',')
+)
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_trusted_origins.split(',') if origin.strip()]
 
 
 ROOT_URLCONF = 'autocare.urls'
